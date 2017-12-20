@@ -1,6 +1,10 @@
 {
     "compilerOptions": {
         "target": "es5",
+        "outDir": "./dist/",
+        "include": [
+            "./src/**/*"
+        ],
         "module": "es2015",
         "moduleResolution": "node",
         "strictNullChecks": true,

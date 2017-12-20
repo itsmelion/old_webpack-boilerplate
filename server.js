@@ -4,7 +4,7 @@ const path = require('path');
 
 const app = express();
 
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 80);
 
 if (process.env.NODE_ENV === 'development') {
     const webpackConfig = require('./webpack.config.js');
@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'app/index.html'));
+    res.sendFile(path.join(__dirname, 'src/index.html'));
 });
 
 

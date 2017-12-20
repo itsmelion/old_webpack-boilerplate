@@ -17,17 +17,17 @@ const minify = {
 };
 const config = {
     entry: {
-        main: './app/index.ts',
-        // oldMessages: './app/old-messages.ts',
+        main: './src/index.ts',
+        // oldMessages: './src/old-messages.ts',
         vendor: ['whatwg-fetch'],
     },
     output: {
-        path: path.join(__dirname, 'dist'),
         filename: '[name].[hash:8].bundle.js',
+        path: path.join(__dirname, 'dist'),
         publicPath: '/',
     },
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.js', ".json"],
     },
     plugins: [
         new webpack.optimize.CommonsChunkPlugin({
@@ -36,13 +36,13 @@ const config = {
             minChunks: 2,
         }),
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, 'app', 'index.html'),
+            template: path.join(__dirname, 'src', 'index.html'),
             filename: 'index.html',
             chunks: ['main', 'commons', 'vendor'],
             minify,
         }),
         // new HtmlWebpackPlugin({
-        //     template: path.join(__dirname, 'app', 'old-messages.html'),
+        //     template: path.join(__dirname, 'src', 'old-messages.html'),
         //     filename: 'old-messages.html',
         //     chunks: ['oldMessages', 'commons', 'vendor'],
         //     minify,
@@ -60,7 +60,7 @@ const config = {
                 test: /\.html$/,
                 loader: 'html-es6-template-loader',
                 exclude(filePath) {
-                    return filePath === path.join(__dirname, 'app', 'index.html');
+                    return filePath === path.join(__dirname, 'src', 'index.html');
                 },
                 query: {
                     transpile: true,
