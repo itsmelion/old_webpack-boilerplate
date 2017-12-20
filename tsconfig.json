@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outDir": "./dist/",
+        "include": [
+            "./src/**/*"
+        ],
+        "module": "es2015",
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "lib": [
+            "es7",
+            "dom",
+            "dom.iterable",
+            "scripthost"
+        ]
+    }
+}
