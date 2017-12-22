@@ -9,7 +9,7 @@ var stripAnsi = require('strip-ansi');
 /**
  * Require ./webpack.config.js and make a bundler from it
  */
-var webpackConfig = require('../webpack.config');
+var webpackConfig = require('./webpack.config');
 var bundler = webpack(webpackConfig);
 
 /**
@@ -31,7 +31,7 @@ bundler.plugin('done', function (stats) {
  * Run Browsersync and use middleware for Hot Module Replacement
  */
 browserSync.init({
-    server: 'src',
+    server: 'dist',
     open: false,
     logFileChanges: false,
     middleware: [
