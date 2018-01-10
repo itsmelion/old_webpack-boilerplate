@@ -57,69 +57,69 @@ const config = {
     ],
     module: {
         rules: [{
-                test: /\.html$/,
-                loader: 'html-es6-template-loader',
-                exclude(filePath) {
-                    return filePath === path.join(__dirname, 'src', 'index.html');
-                },
-                query: {
-                    transpile: true,
-                },
+            test: /\.html$/,
+            loader: 'html-es6-template-loader',
+            exclude(filePath) {
+                return filePath === path.join(__dirname, 'src', 'index.html');
             },
-            {
-                test: /\.js$/,
-                loader: 'babel-loader',
-                options: {
-                    presets: [
-                        ['es2015', {
-                            modules: false,
-                        }],
-                    ],
-                },
-                exclude: /node_modules/,
+            query: {
+                transpile: true,
             },
-            {
-                test: /\.ts$/,
-                loader: 'awesome-typescript-loader',
-            },
-            {
-                test: /\.s[ac]ss$/,
-                loader: extractSass.extract({
-                    use: [{
-                            loader: 'css-loader',
-                            options: {
-                                importLoaders: 1
-                            }
-                        },
-                        {
-                            loader: 'postcss-loader'
-                        },
-                        {
-                            loader: 'sass-loader'
-                        },
-                    ],
-                    fallback: 'style-loader',
-                }),
-            },
-            {
-                test: /\.(jpe?g|png|gif|svg)/,
-                use: [{
-                        loader: 'url-loader',
-                        query: {
-                            limit: 5000,
-                            name: '[name].[hash:8].[ext]',
-                        },
-                    },
-                    {
-                        loader: 'image-webpack-loader',
-                        query: {
-                            mozjpeg: {
-                                quality: 65,
-                            },
-                        },
-                    },
+        },
+        {
+            test: /\.js$/,
+            loader: 'babel-loader',
+            options: {
+                presets: [
+                    ['es2017', {
+                        modules: false,
+                    }],
                 ],
             },
+            exclude: /node_modules/,
+        },
+        {
+            test: /\.ts$/,
+            loader: 'awesome-typescript-loader',
+        },
+        {
+            test: /\.s[ac]ss$/,
+            loader: extractSass.extract({
+                use: [{
+                    loader: 'css-loader',
+                    options: {
+                        importLoaders: 1
+                    }
+                },
+                {
+                    loader: 'postcss-loader'
+                },
+                {
+                    loader: 'sass-loader'
+                },
+                ],
+                fallback: 'style-loader',
+            }),
+        },
+        {
+            test: /\.(jpe?g|png|gif|svg)/,
+            use: [{
+                loader: 'url-loader',
+                query: {
+                    limit: 5000,
+                    name: '[name].[hash:8].[ext]',
+                },
+            },
+            {
+                loader: 'image-webpack-loader',
+                query: {
+                    mozjpeg: {
+                        quality: 65,
+                    },
+                },
+            },
+            ],
+        },
         ],
     },
 };

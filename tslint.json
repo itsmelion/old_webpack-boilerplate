@@ -9,6 +9,7 @@
             true,
             90
         ],
+        "indent":true,
         "quotemark": false,
         "no-console": [
             false

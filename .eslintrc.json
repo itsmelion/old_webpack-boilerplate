@@ -1,13 +1,16 @@
 {
+    "root": true,
     "env": {
         "browser": true,
         "commonjs": true,
         "es6": true,
+        "jquery": true,
+        "amd": true,
         "node": true
     },
     "parserOptions": {
         "ecmaFeatures": {
-            "jsx": true
+            "jsx": false
         },
         "sourceType": "module"
     },
@@ -18,6 +21,34 @@
         "no-unreachable": "warn",
         "no-unused-vars": "warn",
         "constructor-super": "warn",
-        "valid-typeof": "warn"
+        "valid-typeof": "warn",
+        "indent": ["warn", 4],
+        "camelcase": "warn",
+        "eqeqeq": "warn",
+        "no-bitwise": "error",
+        "no-empty": "error",
+        "no-irregular-whitespace": "warn",
+        "no-undefined": "warn",
+        "no-debugger": "warn",
+        "no-console": "warn",
+        "no-dupe-keys": "error",
+        "default-case": "error",
+        "no-alert": "error",
+        "no-var": "warn",
+        "prefer-const": "warn",
+        "prefer-arrow-callback": "warn",
+        "prefer-rest-params": "warn",
+        "prefer-template": "warn",
+        "no-extra-semi": "warn",
+        "semi-style": "warn",
+        "semi": "warn",
+        "wrap-iife": "error",
+        "curly": "error",
+        "new-cap": "error",
+        "brace-style": "warn"
+
+    },
+    "globals": {
+        "$": false
     }
 }

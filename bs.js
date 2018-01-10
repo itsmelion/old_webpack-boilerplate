@@ -1,22 +1,23 @@
 /**
  * Require Browsersync along with webpack and middleware for it
  */
-var browserSync = require('browser-sync').create();
-var webpack = require('webpack');
-var webpackDevMiddleware = require('webpack-dev-middleware');
-var stripAnsi = require('strip-ansi');
+const browserSync = require('browser-sync').create();
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const middleware = require('connect-gzip-static')('./dist');
+const stripAnsi = require('strip-ansi');
 
 /**
  * Require ./webpack.config.js and make a bundler from it
  */
-var webpackConfig = require('./webpack.config');
-var bundler = webpack(webpackConfig);
+const webpackConfig = require('./webpack.config');
+const bundler = webpack(webpackConfig);
 
 /**
  * Reload all devices when bundle is complete
  * or send a fullscreen error message to the browser instead
  */
-bundler.plugin('done', function (stats) {
+bundler.plugin('done', (stats) => {
     if (stats.hasErrors() || stats.hasWarnings()) {
         return browserSync.sockets.emit('fullscreen:message', {
             title: "Webpack Error:",
@@ -44,6 +45,12 @@ browserSync.init({
     ],
     plugins: ['bs-fullscreen-message'],
     files: [
-        'src/*.html'
-    ]
+        'dist/*.html',
+        'dist/*.css',
+        'dist/*.js',
+    ],
+}, (err, bs) => {
+    bs.addMiddleware("*", middleware, {
+        override: true
+    });
 });
