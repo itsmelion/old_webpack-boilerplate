@@ -11,6 +11,7 @@
         ],
         "indent":true,
         "quotemark": false,
+        "arrow-parens": false,
         "no-console": [
             false
         ],
