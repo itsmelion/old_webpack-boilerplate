@@ -2,16 +2,22 @@
 const express = require('express');
 const path = require('path');
 
+
 const app = express();
 
 app.set('port', process.env.PORT || 80);
 
 if (process.env.NODE_ENV === 'development') {
-    const webpackConfig = require('./webpack.config.js');
+    const config = require('./webpack.config.js');
     const webpack = require('webpack');
-    const webpackMiddleware = require('webpack-dev-middleware');
+    const compiler = webpack(config);
+    const webpackDevMiddleware = require('webpack-dev-middleware');
 
-    app.use(webpackMiddleware(webpack(webpackConfig)));
+    // Tell express to use the webpack-dev-middleware and use the webpack.config.js
+    // configuration file as a base.
+    app.use(webpackDevMiddleware(compiler, {
+        publicPath: config.output.publicPath
+    }));
 } else {
     app.use(express.static('dist'));
 }

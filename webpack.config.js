@@ -1,9 +1,12 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
-const UglifyJsWebpackPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 const extractSass = new ExtractTextWebpackPlugin({
     filename: '[name].[contenthash:8].bundle.css',
@@ -30,6 +33,10 @@ const config = {
         extensions: ['.ts', '.js', ".json"],
     },
     plugins: [
+        new CleanWebpackPlugin(['dist']),
+        new webpack.WatchIgnorePlugin([
+            /\.d\.ts$/
+        ]),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'commons',
             filename: 'commons.[hash:8].bundle.js',
@@ -48,12 +55,28 @@ const config = {
         //     minify,
         // }),
         extractSass,
-        new UglifyJsWebpackPlugin({
+        new UglifyJSPlugin({
             sourceMap: true,
         }),
         new CompressionWebpackPlugin({
             asset: '[path].gz',
         }),
+        new ManifestPlugin(),
+        new BrowserSyncPlugin({
+            host: 'localhost',
+            port: 3000,
+            proxy: 'http://localhost:8080/',
+            watchOptions: {
+                ignoreInitial: true,
+                ignored: './src'
+            },
+            ui: false,
+            ghostMode: false,
+            logPrefix: "ΛLIΛ",
+            logFileChanges: true
+        }, {
+            reload: false
+        })
     ],
     module: {
         rules: [{
@@ -69,6 +92,7 @@ const config = {
         {
             test: /\.js$/,
             loader: 'babel-loader',
+            include: path.resolve(__dirname, "src"),
             options: {
                 presets: [
                     ['es2017', {
@@ -79,8 +103,9 @@ const config = {
             exclude: /node_modules/,
         },
         {
-            test: /\.ts$/,
-            loader: 'awesome-typescript-loader',
+            test: /\.tsx?$/,
+            loader: 'ts-loader', // ts-loader ??
+            exclude: /node_modules/
         },
         {
             test: /\.s[ac]ss$/,
@@ -117,9 +142,14 @@ const config = {
                         quality: 65,
                     },
                 },
-            },
-            ],
+            }],
         },
+        {
+            test: /\.(woff|woff2|eot|ttf|otf)$/,
+            use: [
+                'file-loader'
+            ]
+        }
         ],
     },
 };
