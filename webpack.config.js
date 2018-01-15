@@ -5,11 +5,12 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 const extractSass = new ExtractTextWebpackPlugin({
-    filename: '[name].[contenthash:8].bundle.css',
+    filename: '[name].[contenthash:8].css',
     disable: false,
 });
 
@@ -21,16 +22,14 @@ const minify = {
 const config = {
     entry: {
         main: './src/index.ts',
-        // oldMessages: './src/old-messages.ts',
-        vendor: ['whatwg-fetch'],
     },
     output: {
-        filename: '[name].[hash:8].bundle.js',
+        filename: '[name].[hash:8].js',
         path: path.join(__dirname, 'dist'),
-        publicPath: '/',
+        publicPath: './dist',
     },
     resolve: {
-        extensions: ['.ts', '.js', ".json"],
+        extensions: ['.ts', 'ejs', '.js', ".json"],
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
@@ -39,21 +38,16 @@ const config = {
         ]),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'commons',
-            filename: 'commons.[hash:8].bundle.js',
-            minChunks: 2,
+            filename: 'commons.[hash:8].js',
+            minChunks: Infinity
         }),
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, 'src', 'index.html'),
-            filename: 'index.html',
-            chunks: ['main', 'commons', 'vendor'],
+            template: `!!raw-loader!${path.join(__dirname, 'src/index.ejs')}`,
+            filename: 'index.ejs',
+            chunks: ['main', 'commons'],
+            transpile: false,
             minify,
         }),
-        // new HtmlWebpackPlugin({
-        //     template: path.join(__dirname, 'src', 'old-messages.html'),
-        //     filename: 'old-messages.html',
-        //     chunks: ['oldMessages', 'commons', 'vendor'],
-        //     minify,
-        // }),
         extractSass,
         new UglifyJSPlugin({
             sourceMap: true,
@@ -61,35 +55,28 @@ const config = {
         new CompressionWebpackPlugin({
             asset: '[path].gz',
         }),
+        new CopyWebpackPlugin ([
+            { from: './src/views', to: './views' }
+        ]),
         new ManifestPlugin(),
         new BrowserSyncPlugin({
             host: 'localhost',
             port: 3000,
             proxy: 'http://localhost:8080/',
-            watchOptions: {
-                ignoreInitial: true,
-                ignored: './src'
-            },
+            // watchOptions: {
+            //     ignoreInitial: true,
+            //     // ignored: './src'
+            // },
             ui: false,
             ghostMode: false,
             logPrefix: "ΛLIΛ",
             logFileChanges: true
         }, {
-            reload: false
+            reload: true
         })
     ],
     module: {
         rules: [{
-            test: /\.html$/,
-            loader: 'html-es6-template-loader',
-            exclude(filePath) {
-                return filePath === path.join(__dirname, 'src', 'index.html');
-            },
-            query: {
-                transpile: true,
-            },
-        },
-        {
             test: /\.js$/,
             loader: 'babel-loader',
             include: path.resolve(__dirname, "src"),
@@ -104,7 +91,7 @@ const config = {
         },
         {
             test: /\.tsx?$/,
-            loader: 'ts-loader', // ts-loader ??
+            loader: 'ts-loader',
             exclude: /node_modules/
         },
         {
@@ -158,9 +145,11 @@ if (process.env.NODE_ENV === 'development') {
     config.watch = true;
     config.devtool = 'source-map';
 } else if (process.env.NODE_ENV === 'hot') {
+    config.watch = true;
     config.devtool = 'source-map';
     config.devServer = {
         hot: true,
+        historyApiFallback: true
     };
     config.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
