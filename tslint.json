@@ -16,9 +16,12 @@
             false
         ],
         "only-arrow-functions": [
-            false
+            true
         ],
         "no-var-requires": false
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "globals": {
+        "$": false
+    }
 }

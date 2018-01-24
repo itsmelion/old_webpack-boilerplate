@@ -1,4 +1,4 @@
-/* eslint global-require: 0, import/no-extraneous-dependencies: 0 */
+require('dotenv').config()
 const express = require('express');
 const path = require('path');
 const compression = require('compression');

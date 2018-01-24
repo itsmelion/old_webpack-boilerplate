@@ -29,7 +29,7 @@ const config = {
         publicPath: './dist',
     },
     resolve: {
-        extensions: ['.ts', 'ejs', '.js', ".json"],
+        extensions: ['.ts', '.ejs', '.html', '.js', '.json'],
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
@@ -49,9 +49,7 @@ const config = {
             minify,
         }),
         extractSass,
-        new UglifyJSPlugin({
-            sourceMap: true,
-        }),
+        new UglifyJSPlugin(),
         new CompressionWebpackPlugin({
             asset: '[path].gz',
         }),
@@ -144,6 +142,7 @@ const config = {
 if (process.env.NODE_ENV === 'development') {
     config.watch = true;
     config.devtool = 'source-map';
+    config.plugins.push(new webpack.HotModuleReplacementPlugin());
 } else if (process.env.NODE_ENV === 'hot') {
     config.watch = true;
     config.devtool = 'source-map';
