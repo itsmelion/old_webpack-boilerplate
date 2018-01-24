@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -29,7 +31,7 @@ const config = {
         publicPath: './dist',
     },
     resolve: {
-        extensions: ['.ts', '.ejs', '.html', '.js', '.json'],
+        extensions: ['.ts', '.php', '.js', '.json'],
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
@@ -41,33 +43,33 @@ const config = {
             filename: 'commons.[hash:8].js',
             minChunks: Infinity
         }),
-        new HtmlWebpackPlugin({
-            template: `!!raw-loader!${path.join(__dirname, 'src/index.ejs')}`,
-            filename: 'index.ejs',
-            chunks: ['main', 'commons'],
-            transpile: false,
-            minify,
-        }),
+        // new HtmlWebpackPlugin({
+        //     template: `!!raw-loader!${path.join(__dirname, 'src/views/index.php')}`,
+        //     filename: 'index.php',
+        //     chunks: ['main', 'commons'],
+        //     transpile: false,
+        //     minify,
+        // }),
         extractSass,
         new UglifyJSPlugin(),
         new CompressionWebpackPlugin({
             asset: '[path].gz',
         }),
         new CopyWebpackPlugin ([
-            { from: './src/views', to: './views' }
+            { from: './src/views', to: './' }
         ]),
         new ManifestPlugin(),
         new BrowserSyncPlugin({
             host: 'localhost',
             port: 3000,
-            proxy: 'http://localhost:8080/',
+            proxy: process.env.appURL,
             // watchOptions: {
             //     ignoreInitial: true,
             //     // ignored: './src'
             // },
             ui: false,
             ghostMode: false,
-            logPrefix: "ΛLIΛ",
+            logPrefix: process.env.appName,
             logFileChanges: true
         }, {
             reload: true
@@ -134,6 +136,20 @@ const config = {
             use: [
                 'file-loader'
             ]
+        },
+        {
+            test: /\.php$/,
+            use: [
+                'raw!html-minifier-loader'
+            ],
+            options: {
+                'html-minifier-loader': {
+                    removeComments: false,
+                    collapseWhitespace: true,
+                    conservativeCollapse: true,
+                    preserveLineBreaks: true
+                }
+            }
         }
         ],
     },
