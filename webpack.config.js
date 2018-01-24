@@ -27,14 +27,14 @@ const config = {
     },
     output: {
         filename: '[name].[hash:8].js',
-        path: path.join(__dirname, 'dist'),
-        publicPath: './dist',
+        path: path.join(__dirname, process.env.themeDirectory),
+        publicPath: process.env.themeDirectory,
     },
     resolve: {
         extensions: ['.ts', '.php', '.js', '.json'],
     },
     plugins: [
-        new CleanWebpackPlugin(['dist']),
+        new CleanWebpackPlugin([process.env.themeDirectory]),
         new webpack.WatchIgnorePlugin([
             /\.d\.ts$/
         ]),
@@ -141,15 +141,7 @@ const config = {
             test: /\.php$/,
             use: [
                 'raw!html-minifier-loader'
-            ],
-            options: {
-                'html-minifier-loader': {
-                    removeComments: false,
-                    collapseWhitespace: true,
-                    conservativeCollapse: true,
-                    preserveLineBreaks: true
-                }
-            }
+            ]
         }
         ],
     },

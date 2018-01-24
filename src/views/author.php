@@ -1,73 +1,81 @@
-<?php get_header();
+<?php get_header(); ?>
 
-$desktop = get_field('background_image_desktop');
-$mobile = get_field('background_image_mobile');
+	<main role="main" aria-label="Content">
+		<!-- section -->
+		<section>
 
-if(!$mobile):
-  $mobile = get_field('background_image_desktop');
-endif;
-?>
+		<?php if ( have_posts() ): the_post(); ?>
 
-<style>
-/*
-## CUSTOM BACKGROUND
-.this-header{
-  background: url("<?php echo $desktop['sizes']['large']; ?>");
-}
-@media screen and (max-width: 58em){
-  .this-header{
-    background: url("<?php echo $mobile['sizes']['large']; ?>");
-  }
-} */
+			<h1><?php esc_html_e( 'Author Archives for ', 'html5blank' ); echo get_the_author(); ?></h1>
 
-.this-header{
-  background: url("<?php echo get_bloginfo('template_url') ?>/build/images/blog-wide.jpg");
-}
-@media screen and (max-width: 58em){
-  .this-header{
-    background: url("<?php echo get_bloginfo('template_url') ?>/build/images/blog-mobile.jpg");
-  }
-}
-</style>
+		<?php if ( get_the_author_meta( 'description' ) ) : ?>
 
-<?php wp_nav_menu( array( 'theme_location' => 'CategoryMenu','container' => false, 'menu_class' => 'layout-row-start blog-menu' ) ); ?>
-<header id="blog-header" class="layout-column-center flex default this-header" role="banner">
-    <div class="flex layout-column-nowrap-center">
-        <h1 style="font-weight: bold;">
-        <?php _e( 'Author: &nbsp;', 'html5blank' ); echo get_the_author(); ?>
-        </h1>
-        <?php if ( get_the_author_meta('description')) : ?>
+		<?php echo get_avatar( get_the_author_meta( 'user_email' ) ); ?>
 
-		<?php echo get_avatar(get_the_author_meta('user_email')); ?>
+			<h2><?php esc_html_e( 'About ', 'html5blank' ); echo get_the_author(); ?></h2>
 
-			<h3><?php _e( 'About ', 'html5blank' ); ?></h3>
-
-			<?php echo wpautop( get_the_author_meta('description') ); ?>
+			<?php echo wpautop( get_the_author_meta( 'description' ) ); ?>
 
 		<?php endif; ?>
-    </div>
-</header>
 
-<div class="contain layout-row-nowrap-between" style="width:100%">
+		<?php rewind_posts(); while ( have_posts() ) : the_post(); ?>
 
-    <main class="flex-none" role="main" aria-label="Content">
+			<!-- article -->
+			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
-        <section class="layout-column-nowrap-start blog-default">
-            <?php get_template_part('loop'); ?>
-        </section>
+				<!-- post thumbnail -->
+				<?php if ( has_post_thumbnail() ) : // Check if Thumbnail exists. ?>
+					<a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+						<?php the_post_thumbnail( array( 120, 120 ) ); // Declare pixel size you need inside the array. ?>
+					</a>
+				<?php endif; ?>
+				<!-- /post thumbnail -->
 
-    </main>
+				<!-- post title -->
+				<h2>
+					<a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a>
+				</h2>
+				<!-- /Post title -->
 
-    <!-- sidebar -->
-    <aside class="flex-none layout-column-nowrap widget-area sidebar" role="complementary">
+				<!-- post details -->
+				<span class="date">
+					<time datetime="<?php the_time( 'Y-m-d' ); ?> <?php the_time( 'H:i' ); ?>">
+						<?php the_date(); ?> <?php the_time(); ?>
+					</time>
+				</span>
+				<span class="author"><?php esc_html_e( 'Published by', 'html5blank' ); ?> <?php the_author_posts_link(); ?></span>
+				<span class="comments"><?php comments_popup_link( __( 'Leave your thoughts', 'html5blank' ), __( '1 Comment', 'html5blank' ), __( '% Comments', 'html5blank' ) ); ?></span>
+				<!-- /post details -->
 
-        <?php if(!function_exists('dynamic_sidebar') || !dynamic_sidebar('widget-area-2')): ?>
-        <div class="sidebar-widget">
-        </div>
-        <?php endif; ?>
+				<?php html5wp_excerpt( 'html5wp_index' ); // Build your custom callback length in functions.php. ?>
 
-    </aside>
-    <!-- /sidebar -->
-</div>
+				<br class="clear">
+
+				<?php edit_post_link(); ?>
+
+			</article>
+			<!-- /article -->
+
+		<?php endwhile; ?>
+
+		<?php else : ?>
+
+			<!-- article -->
+			<article>
+
+				<h2><?php esc_html_e( 'Sorry, nothing to display.', 'html5blank' ); ?></h2>
+
+			</article>
+			<!-- /article -->
+
+		<?php endif; ?>
+
+			<?php get_template_part( 'pagination' ); ?>
+
+		</section>
+		<!-- /section -->
+	</main>
+
+<?php get_sidebar(); ?>
 
 <?php get_footer(); ?>
