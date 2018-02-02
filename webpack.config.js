@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -29,17 +31,22 @@ const config = {
         publicPath: './dist',
     },
     resolve: {
-        extensions: ['.ts', '.ejs', '.html', '.js', '.json'],
+        extensions: ['.ts', '.ejs', '.html', '.js'],
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            Popper: 'popper.js',
+        }),
         new webpack.WatchIgnorePlugin([
-            /\.d\.ts$/
+            /\.d\.ts$/,
         ]),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'commons',
             filename: 'commons.[hash:8].js',
-            minChunks: Infinity
+            minChunks: Infinity,
         }),
         new HtmlWebpackPlugin({
             template: `!!raw-loader!${path.join(__dirname, 'src/index.ejs')}`,
@@ -49,48 +56,32 @@ const config = {
             minify,
         }),
         extractSass,
-        new UglifyJSPlugin(),
-        new CompressionWebpackPlugin({
-            asset: '[path].gz',
-        }),
-        new CopyWebpackPlugin ([
-            { from: './src/views', to: './views' }
+        new CopyWebpackPlugin([
+            { from: './src/views', to: './views' },
         ]),
-        new ManifestPlugin(),
-        new BrowserSyncPlugin({
-            host: 'localhost',
-            port: 3000,
-            proxy: 'http://localhost:8080/',
-            // watchOptions: {
-            //     ignoreInitial: true,
-            //     // ignored: './src'
-            // },
-            ui: false,
-            ghostMode: false,
-            logPrefix: "ΛLIΛ",
-            logFileChanges: true
-        }, {
-            reload: true
-        })
     ],
     module: {
         rules: [{
             test: /\.js$/,
             loader: 'babel-loader',
-            include: path.resolve(__dirname, "src"),
-            options: {
-                presets: [
-                    ['es2017', {
-                        modules: false,
-                    }],
-                ],
-            },
+            include: path.resolve(__dirname, 'src'),
             exclude: /node_modules/,
+            options: {
+                presets: ['env'],
+            },
         },
         {
             test: /\.tsx?$/,
-            loader: 'ts-loader',
-            exclude: /node_modules/
+            exclude: /node_modules/,
+            use: [
+                {
+                    loader: 'babel-loader',
+                    options: { presets: ['env'] },
+                },
+                {
+                    loader: 'ts-loader',
+                },
+            ],
         },
         {
             test: /\.s[ac]ss$/,
@@ -98,14 +89,14 @@ const config = {
                 use: [{
                     loader: 'css-loader',
                     options: {
-                        importLoaders: 1
-                    }
+                        importLoaders: 1,
+                    },
                 },
                 {
-                    loader: 'postcss-loader'
+                    loader: 'postcss-loader',
                 },
                 {
-                    loader: 'sass-loader'
+                    loader: 'sass-loader',
                 },
                 ],
                 fallback: 'style-loader',
@@ -113,28 +104,52 @@ const config = {
         },
         {
             test: /\.(jpe?g|png|gif|svg)/,
-            use: [{
-                loader: 'url-loader',
-                query: {
-                    limit: 5000,
-                    name: '[name].[hash:8].[ext]',
-                },
-            },
-            {
-                loader: 'image-webpack-loader',
-                query: {
-                    mozjpeg: {
-                        quality: 65,
+            use: [
+                {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[path][name].[ext]',
+                        context: './src',
                     },
                 },
-            }],
+                {
+                    loader: 'image-webpack-loader',
+                    options: {
+                        mozjpeg: {
+                            progressive: true,
+                            quality: 65,
+                        },
+                        // optipng.enabled: false will disable optipng
+                        optipng: {
+                            enabled: false,
+                        },
+                        pngquant: {
+                            quality: '65-90',
+                            speed: 4,
+                        },
+                        gifsicle: {
+                            interlaced: false,
+                        },
+                        // the webp option will enable WEBP
+                        webp: {
+                            quality: 75,
+                        },
+                    },
+                },
+            ],
         },
         {
             test: /\.(woff|woff2|eot|ttf|otf)$/,
             use: [
-                'file-loader'
-            ]
-        }
+                'file-loader',
+            ],
+        },
+        {
+            test: /\.php$/,
+            use: [
+                'raw!html-minifier-loader',
+            ],
+        },
         ],
     },
 };
@@ -142,15 +157,57 @@ const config = {
 if (process.env.NODE_ENV === 'development') {
     config.watch = true;
     config.devtool = 'source-map';
-    config.plugins.push(new webpack.HotModuleReplacementPlugin());
+    config.plugins.push(
+        new webpack.HotModuleReplacementPlugin(),
+        new BrowserSyncPlugin({
+            host: 'localhost',
+            port: 3000,
+            proxy: 'http://localhost:8080/',
+            watchOptions: {
+                ignoreInitial: true,
+                // ignored: './src'
+            },
+            ui: false,
+            ghostMode: false,
+            logPrefix: 'ΛLIΛ',
+            logFileChanges: true,
+        }, {
+            reload: true,
+        }),
+    );
 } else if (process.env.NODE_ENV === 'hot') {
     config.watch = true;
     config.devtool = 'source-map';
     config.devServer = {
         hot: true,
-        historyApiFallback: true
+        historyApiFallback: true,
     };
-    config.plugins.push(new webpack.HotModuleReplacementPlugin());
+    config.plugins.push(
+        new webpack.HotModuleReplacementPlugin(),
+        new BrowserSyncPlugin({
+            host: 'localhost',
+            port: 3000,
+            proxy: 'http://localhost:8080/',
+            watchOptions: {
+                ignoreInitial: true,
+                // ignored: './src'
+            },
+            ui: false,
+            ghostMode: false,
+            logPrefix: 'ΛLIΛ',
+            logFileChanges: true,
+        }, {
+            reload: true,
+        }),
+    );
+} else {
+    config.plugins.push(
+        new UglifyJSPlugin(),
+        new CompressionWebpackPlugin({
+            asset: '[path].gz',
+        }),
+        new ManifestPlugin(),
+    );
 }
 
 module.exports = config;
