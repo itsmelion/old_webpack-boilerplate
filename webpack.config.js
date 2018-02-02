@@ -27,8 +27,10 @@ const config = {
     },
     output: {
         filename: '[name].[hash:8].js',
-        path: path.join(__dirname, 'dist'),
-        publicPath: './dist',
+        path: path.join(__dirname, process.env.output),
+        publicPath: process.env.publicPath,
+        hotUpdateChunkFilename: 'hot/hot-update.js',
+        hotUpdateMainFilename: 'hot/hot-update.json',
     },
     resolve: {
         extensions: ['.ts', '.ejs', '.html', '.js'],
@@ -49,8 +51,8 @@ const config = {
             minChunks: Infinity,
         }),
         new HtmlWebpackPlugin({
-            template: `!!raw-loader!${path.join(__dirname, 'src/index.ejs')}`,
-            filename: 'index.ejs',
+            template: `!!raw-loader!${path.join(__dirname, 'src/index.html')}`,
+            filename: 'index.html',
             chunks: ['main', 'commons'],
             transpile: false,
             minify,
@@ -162,7 +164,7 @@ if (process.env.NODE_ENV === 'development') {
         new BrowserSyncPlugin({
             host: 'localhost',
             port: 3000,
-            proxy: 'http://localhost:8080/',
+            server: { baseDir: [`./${process.env.output}`] },
             watchOptions: {
                 ignoreInitial: true,
                 // ignored: './src'
@@ -197,7 +199,7 @@ if (process.env.NODE_ENV === 'development') {
             logPrefix: 'ΛLIΛ',
             logFileChanges: true,
         }, {
-            reload: true,
+            reload: false,
         }),
     );
 } else {

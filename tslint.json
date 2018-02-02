@@ -1,7 +1,7 @@
 {
     "defaultSeverity": "warn",
     "extends": [
-        "tslint:recommended"
+        "airbnb"
     ],
     "jsRules": {},
     "rules": {

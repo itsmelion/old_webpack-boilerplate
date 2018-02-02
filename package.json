@@ -4,12 +4,10 @@
     "description": "A Generic configuration for scaffolding Web projects using ES6 or Typescript",
     "main": "index.js",
     "scripts": {
-        "start": "NODE_ENV=development webpack --progress --colors | PORT=8080 nodemon server.js",
-        "build:dev": "NODE_ENV=development webpack --progress --colors",
+        "start": "NODE_ENV=development webpack --progress --colors",
         "build": "webpack -p --progress --colors",
-        "serve": "webpack --progress --colors && npm run express",
         "hot": "NODE_ENV=hot webpack-dev-server --progress --colors",
-        "express": "PORT=8080 node server.js"
+        "deploy": "echo '\n\t######## WARN ########\n\tNo Deploy task specified\n\n'"
     },
     "repository": {
         "type": "git",
@@ -29,9 +27,9 @@
     "homepage": "https://gitlab.com/alia-code/webpack#README",
     "dependencies": {
         "dotenv": "^5.0.0",
-        "express": "^4.16.2",
-        "compression": "^1.7.1",
         "moment": "^2.20.1",
+        "pace": "0.0.4",
+        "pace-js": "^1.0.2",
         "whatwg-fetch": "^2.0.3"
     },
     "devDependencies": {
@@ -44,12 +42,8 @@
         "browser-sync-webpack-plugin": "latest",
         "clean-webpack-plugin": "^0.1.18",
         "compression-webpack-plugin": "^1.1.6",
-        "connect-gzip-static": "^2.1.1",
         "copy-webpack-plugin": "^4.3.1",
         "css-loader": "^0.28.9",
-        "ejs": "^2.5.7",
-        "ejs-compiled-loader": "^1.1.0",
-        "ejs-loader": "^0.3.0",
         "eslint": "^4.16.0",
         "eslint-config-airbnb": "latest",
         "eslint-plugin-import": "^2.8.0",
@@ -60,10 +54,8 @@
         "html-es6-template-loader": "^1.0.5",
         "html-webpack-plugin": "^2.30.1",
         "html-webpack-template": "^6.1.0",
-        "http-server": "^0.11.1",
         "image-webpack-loader": "^4.0.0",
         "node-sass": "^4.7.2",
-        "nodemon": "^1.14.12",
         "postcss": "^6.0.17",
         "postcss-cssnext": "^3.1.0",
         "postcss-import": "^11.0.0",
