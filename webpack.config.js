@@ -2,12 +2,13 @@ require('dotenv').config();
 
 const path = require('path');
 const webpack = require('webpack');
+// const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
@@ -27,7 +28,7 @@ const config = {
     },
     output: {
         filename: '[name].[hash:8].js',
-        path: path.join(__dirname, process.env.output),
+        path: path.join(process.cwd(), process.env.output),
         publicPath: process.env.publicPath,
         hotUpdateChunkFilename: 'hot/hot-update.js',
         hotUpdateMainFilename: 'hot/hot-update.json',
@@ -36,7 +37,7 @@ const config = {
         extensions: ['.ts', '.ejs', '.html', '.js'],
     },
     plugins: [
-        new CleanWebpackPlugin(['dist']),
+        new CleanWebpackPlugin([process.env.output]),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
@@ -45,6 +46,7 @@ const config = {
         new webpack.WatchIgnorePlugin([
             /\.d\.ts$/,
         ]),
+        new ProgressPlugin(),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'commons',
             filename: 'commons.[hash:8].js',
@@ -58,9 +60,9 @@ const config = {
             minify,
         }),
         extractSass,
-        new CopyWebpackPlugin([
-            { from: './src/views', to: './views' },
-        ]),
+        // new CopyWebpackPlugin([
+        //     { from: './src/views', to: './views' },
+        // ]),
     ],
     module: {
         rules: [{
