@@ -17,7 +17,9 @@ const images = importAll(
 
 import moment from 'moment';
 import "pace-js"; // pace-js/pace.js
+import 'bootstrap';
 import './main.scss';
+
 
 window.document.getElementsByTagName('main')[0]
     .innerHTML = `<h2>Right now is: <b>

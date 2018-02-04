@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const path = require('path');
 const webpack = require('webpack');
-// const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -13,7 +13,7 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 const extractSass = new ExtractTextWebpackPlugin({
-    filename: '[name].[contenthash:8].css',
+    filename: '[name].css',
     disable: false,
 });
 
@@ -27,7 +27,7 @@ const config = {
         main: './src/index.ts',
     },
     output: {
-        filename: '[name].[hash:8].js',
+        filename: '[name].js',
         path: path.join(process.cwd(), process.env.output),
         publicPath: process.env.publicPath,
         hotUpdateChunkFilename: 'hot/hot-update.js',
@@ -42,6 +42,7 @@ const config = {
             $: 'jquery',
             jQuery: 'jquery',
             Popper: 'popper.js',
+            ejs: 'ejs',
         }),
         new webpack.WatchIgnorePlugin([
             /\.d\.ts$/,
@@ -49,29 +50,31 @@ const config = {
         new ProgressPlugin(),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'commons',
-            filename: 'commons.[hash:8].js',
+            filename: 'commons.js',
             minChunks: Infinity,
         }),
         new HtmlWebpackPlugin({
-            template: `!!raw-loader!${path.join(__dirname, 'src/index.html')}`,
+            template: path.join(__dirname, 'src/index.html'),
             filename: 'index.html',
             chunks: ['main', 'commons'],
-            transpile: false,
+            transpile: true,
             minify,
         }),
         extractSass,
-        // new CopyWebpackPlugin([
-        //     { from: './src/views', to: './views' },
-        // ]),
+        new CopyWebpackPlugin([
+            { from: './src/views', to: './views' },
+        ]),
     ],
     module: {
         rules: [{
             test: /\.js$/,
-            loader: 'babel-loader',
             include: path.resolve(__dirname, 'src'),
-            exclude: /node_modules/,
-            options: {
-                presets: ['env'],
+            exclude: /(node_modules|bower_components)/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['@babel/preset-env'],
+                },
             },
         },
         {
@@ -80,7 +83,9 @@ const config = {
             use: [
                 {
                     loader: 'babel-loader',
-                    options: { presets: ['env'] },
+                    options: {
+                        presets: ['@babel/preset-env'],
+                    },
                 },
                 {
                     loader: 'ts-loader',
@@ -149,6 +154,16 @@ const config = {
             ],
         },
         {
+            test: /\.html$/,
+            use: [
+                {loader: 'raw-loader' },
+                {
+                    loader: 'ejs-compiled-loader',
+                    options: { root: __dirname },
+                },
+            ],
+        },
+        {
             test: /\.php$/,
             use: [
                 'raw!html-minifier-loader',
@@ -205,6 +220,9 @@ if (process.env.NODE_ENV === 'development') {
         }),
     );
 } else {
+    config.output.filename = '[name].[hash:8].js';
+    extractSass.filename = '[name].[contenthash:8].css';
+    config.webpack.optimize.CommonsChunkPlugin.filename = 'commons.[hash:8].js';
     config.plugins.push(
         new UglifyJSPlugin(),
         new CompressionWebpackPlugin({
