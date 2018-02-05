@@ -57,12 +57,6 @@ const config = {
             transpile: false,
             minify,
         }),
-        new HtmlWebpackPlugin({
-            template: `!!raw-loader!${path.join(__dirname, 'src/jasmine.html')}`,
-            filename: 'jasmine.html',
-            chunks: ['test'],
-            transpile: false,
-        }),
         extractSass,
         new CopyWebpackPlugin([
             { context: `./${process.env.components}/`, from: { glob: '**/*.ejs' }, to: 'components' },
