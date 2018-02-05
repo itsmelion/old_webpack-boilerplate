@@ -12,7 +12,7 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 const extractSass = new ExtractTextWebpackPlugin({
-    filename: '[name].[contenthash:8].css',
+    filename: '[name].css',
     disable: false,
 });
 
@@ -26,26 +26,28 @@ const config = {
         main: './src/index.ts',
     },
     output: {
-        filename: '[name].[hash:8].js',
-        path: path.join(__dirname, 'dist'),
-        publicPath: './dist',
+        filename: '[name].js',
+        path: path.join(__dirname, process.env.output),
+        publicPath: `./${process.env.output}`,
+        hotUpdateChunkFilename: 'hot/hot-update.js',
+        hotUpdateMainFilename: 'hot/hot-update.json',
     },
     resolve: {
         extensions: ['.ts', '.ejs', '.html', '.js'],
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            Popper: 'popper.js',
-        }),
+        // new webpack.ProvidePlugin({
+        //     $: 'jquery',
+        //     jQuery: 'jquery',
+        //     Popper: 'popper.js',
+        // }),
         new webpack.WatchIgnorePlugin([
             /\.d\.ts$/,
         ]),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'commons',
-            filename: 'commons.[hash:8].js',
+            filename: 'commons.js',
             minChunks: Infinity,
         }),
         new HtmlWebpackPlugin({
@@ -55,9 +57,15 @@ const config = {
             transpile: false,
             minify,
         }),
+        new HtmlWebpackPlugin({
+            template: `!!raw-loader!${path.join(__dirname, 'src/jasmine.html')}`,
+            filename: 'jasmine.html',
+            chunks: ['test'],
+            transpile: false,
+        }),
         extractSass,
         new CopyWebpackPlugin([
-            { from: './src/views', to: './views' },
+            { context: `./${process.env.components}/`, from: { glob: '**/*.ejs' }, to: 'components' },
         ]),
     ],
     module: {
@@ -65,14 +73,14 @@ const config = {
             test: /\.js$/,
             loader: 'babel-loader',
             include: path.resolve(__dirname, 'src'),
-            exclude: /node_modules/,
+            exclude: /(node_modules|bower_components)/,
             options: {
                 presets: ['env'],
             },
         },
         {
             test: /\.tsx?$/,
-            exclude: /node_modules/,
+            exclude: /(node_modules|bower_components)/,
             use: [
                 {
                     loader: 'babel-loader',
@@ -165,7 +173,6 @@ if (process.env.NODE_ENV === 'development') {
             proxy: 'http://localhost:8080/',
             watchOptions: {
                 ignoreInitial: true,
-                // ignored: './src'
             },
             ui: false,
             ghostMode: false,
@@ -190,17 +197,19 @@ if (process.env.NODE_ENV === 'development') {
             proxy: 'http://localhost:8080/',
             watchOptions: {
                 ignoreInitial: true,
-                // ignored: './src'
             },
             ui: false,
             ghostMode: false,
             logPrefix: 'ΛLIΛ',
             logFileChanges: true,
         }, {
-            reload: true,
+            reload: false,
         }),
     );
 } else {
+    config.output.filename = '[name].[hash:8].js';
+    webpack.optimize.CommonsChunkPlugin.filename = 'commons.[hash:8].js';
+    extractSass.filename = '[name].[contenthash:8].css';
     config.plugins.push(
         new UglifyJSPlugin(),
         new CompressionWebpackPlugin({

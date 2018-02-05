@@ -6,7 +6,7 @@ const compression = require('compression');
 const app = express();
 app.use(compression());
 app.set('view engine', 'ejs');
-app.set('views', './views'); // specify the views directory
+app.set('views', './components'); // specify the views directory
 app.set('port', process.env.PORT || 80);
 
 // if (process.env.NODE_ENV === 'development') {
@@ -21,7 +21,9 @@ app.set('port', process.env.PORT || 80);
 //         publicPath: config.output.publicPath
 //     }));
 // } else {
+app.use(express.static(`./${process.env.output}`));
 app.use(express.static('./'));
+
 // }
 
 app.get('/', (req, res) => {
@@ -29,5 +31,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(app.get('port'), () => {
-    console.log(`Listening on port ${app.get('port')}`);
+    console.log(`Listening on port ${app.get('port')}`); // eslint-disable-line
 });

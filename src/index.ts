@@ -16,9 +16,11 @@ const images = importAll(
 );
 
 import moment from 'moment';
-import "pace-js"; // pace-js/pace.js
+const Pace = require("pace-js"); // pace-js/pace.js
 import './main.scss';
 
 window.document.getElementsByTagName('main')[0]
     .innerHTML = `<h2>Right now is: <b>
     ${moment().format('DD/MM/YYYY hh:mm:ss')}</b></h2>`;
+
+Pace.start();
